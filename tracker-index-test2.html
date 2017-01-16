@@ -4,62 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
 
-    <link rel="stylesheet" href="./css/styles-2.css">
 
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCIXnftgrdxeOWM0JuM43XssZmnwzRL_8E"></script>
+    <link type="text/css" rel="stylesheet"
+          href="./css/styles-2.css">
 
-    <script src="./js/jquery-2.1.4.js"></script>
-    <script src="./js/jquery.cookie.js"></script>
+    <script type="text/javascript"
+            src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCIXnftgrdxeOWM0JuM43XssZmnwzRL_8E"></script>
 
+    <script type="text/javascript"
+            src="./js/jquery-2.1.4.js"></script>
 
-    <!--SCRIPTS DATEPICKER-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://rawgit.com/FezVrasta/bootstrap-material-design/master/dist/css/material.min.css">
+    <!--DATEPICKER--------------------------------------------------->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
-    <link rel="stylesheet" href="./css/date-picker/bootstrap-material-datetimepicker.css">
+    <link rel="stylesheet"
+          href="./css/date-picker/bootstrap-material-datetimepicker.css">
 
-    <link href="http://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="text/javascript"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
-    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://rawgit.com/FezVrasta/bootstrap-material-design/master/dist/js/material.min.js"></script>
-    <script type="text/javascript" src="http://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript"
+            src="http://rawgit.com/FezVrasta/bootstrap-material-design/master/dist/js/material.min.js"></script>
 
-    <script type="text/javascript" src="./js/date-picker/bootstrap-material-datetimepicker.js"></script>
-    <!--END SCRIPTS DATEPICKER-->
+    <script type="text/javascript"
+            src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
 
+    <script type="text/javascript"
+            src="./js/date-picker/bootstrap-material-datetimepicker.js"></script>
+
+    <link type="text/css" rel="stylesheet"
+          href="./css/styles-datepicker-fixer.css">
+    <!--END DATEPICKER----------------------------------------------->
 
     <title>Fantom Tracker</title>
 </head>
 <body>
 
-<!--CONTENT-->
+
+<!--CONTENT---------------------------------------------------------->
 <div id="id_nav_bar">
     <div id="id_logo_text">Fantom Tracker</div>
 </div>
 
+<!--DATETIMER PICKER------------------------------------------------->
 <div id="id_nav_bar_dateperiod">
-    <input type="text" name="daterange" value="18/03/2015 08:00" />
+
+    <div id="id-datetime-picker-cntr">
+
+        <div id="id-datetime-picker-cntr-from"
+             style="width: 120px; float: left">
+            <div class="fantom-input-datetimer-picker-label">From</div>
+            <input id="id_input_date_from" type="text" class="fantom-input-datetimer-picker"
+                   value="18/03/2015 08:00"/>
+        </div>
+
+        <div id="id-datetime-picker-cntr-to"
+             style="width: 120px; float: left; margin-left: 16px;">
+            <div class="fantom-input-datetimer-picker-label">To</div>
+            <input id="id_input_date_to" type="text" class="fantom-input-datetimer-picker"
+                   value="18/03/2015 18:00"/>
+        </div>
+
+        <div style="clear: both"></div>
+    </div>
 </div>
+<!--END DATETIMER PICKER--------------------------------------------->
+
 
 <div id="id_map_container">
     <div id='id_google_map'
          style='width: 10px; height: 10px; z-index: 0;'>
     </div>
 </div>
-<!--END CONTENT-->
+<!--END CONTENT------------------------------------------------------>
 
 
-
-
-
-<!--SCRIPTS-->
+<!--SCRIPTS---------------------------------------------------------->
 <script defer src="./js/tracker-events.js"></script>
 <script defer src="./js/tracker-transport-2.js"></script>
 <script defer src="./js/tracker-consts.js"></script>
 <script defer src="./js/tracker-data.js"></script>
 <script defer src="./js/tracker-utils.js"></script>
 <script defer src="./js/tracker-script-test-2.js"></script>
-<!--END SCRIPTS-->
+<!--END SCRIPTS------------------------------------------------------>
+
 </body>
 </html>
