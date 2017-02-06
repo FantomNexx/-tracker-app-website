@@ -1,7 +1,9 @@
 <?php
 //--------------------------------------------------------------------
-//logger( "----------------------------------------------------------" );
+logger( "----------------------------------------------------------" );
 logger( "IP: " . GetUserIp() . " | POST: " . $_POST['request'] );
+
+//var_error_log( $_POST );
 
 $out = new Out();
 $engine = new Engine();
@@ -21,6 +23,7 @@ abstract class Requests{
 	const GET_POINTS = "GET_POINTS";
 	const GET_POINTS_100 = "GET_POINTS_100";
 	const GET_POINTS_LAST = "GET_POINTS_LAST";
+	const GET_POINTS_BY_PERIOD = "GET_POINTS_BY_PERIOD";
 
 	const SYNC_POINTS = "SYNC_POINTS";
 }//Requests
@@ -100,6 +103,10 @@ class Engine{
 
 			case Requests::GET_POINTS_LAST:
 				$this->GetPointsLast();
+				break;
+
+			case Requests::GET_POINTS_BY_PERIOD:
+				$this->GetPointsByPeriod();
 				break;
 
 			case Requests::SYNC_POINTS:
@@ -346,8 +353,7 @@ class Engine{
 			$response_data, ""
 		);//Out
 
-
-	}//GetPoints
+	}
 	//------------------------------------------------------------------
 	private function GetPoints_100(){
 
@@ -384,8 +390,8 @@ class Engine{
 			$response_data, ""
 		);//Out
 	}
-	//GetPoints_100-----------------------------------------------------
-	private function GetPointsLast( ){
+	//------------------------------------------------------------------
+	private function GetPointsLast(){
 
 		$user_id = $_POST['user_id'];
 		$timestamp_first = $_POST['timestamp_first'];
@@ -421,7 +427,46 @@ class Engine{
 			$response_data, ""
 		);//Out
 	}
-	//GetPointsLast-----------------------------------------------------
+	//------------------------------------------------------------------
+	private function GetPointsByPeriod(){
+
+		$user_id = $_POST['user_id'];
+		$stamp_from = $_POST['stamp_from'];
+		$stamp_to = $_POST['stamp_to'];
+
+		if( $user_id == null || $stamp_from == null || $stamp_to == null ){
+			Out::Finish_JSON(
+				$this->request, ReplyCodes::FAIL_DATA,
+				"", ""
+			);
+		}//if no user id or timestamp last was provided
+
+		$result = $this->db->GetPointsByPeriod(
+			$user_id, $stamp_from, $stamp_to );
+
+		if( $result == false ){
+			Out::Finish_JSON(
+				$this->request, ReplyCodes::FAIL_DATA,
+				"", "failed to get data"
+			);//Out
+		}//if failed to get data
+
+		$points = array();
+		$counter = 0;
+
+		while( $row = $result->fetch_array( MYSQLI_ASSOC ) ){
+			$points[$counter++] = $row;
+		}//whilte
+
+		$result->free();
+		$response_data = array( "points" => $points );
+
+		Out::Finish_JSON(
+			$this->request, ReplyCodes::SUCCESS,
+			$response_data, ""
+		);//Out
+	}
+	//------------------------------------------------------------------
 
 
 	//------------------------------------------------------------------
@@ -602,7 +647,7 @@ class DataBase{
 		$this->DisconnectFromDB();
 
 		return $result;
-	}//GetSessions
+	}
 	//------------------------------------------------------------------
 	public function GetPoints( $id_user ){
 
@@ -616,7 +661,7 @@ class DataBase{
 		$this->DisconnectFromDB();
 
 		return $result;
-	}//GetPoints
+	}
 	//------------------------------------------------------------------
 	public function GetPoints_100( $id_user ){
 
@@ -632,12 +677,12 @@ class DataBase{
 
 		return $result;
 	}
-	//GetPoints_100-----------------------------------------------------
+	//------------------------------------------------------------------
 	public function GetPointsLast( $id_user, $timestamp_first ){
 
 		$query = "SELECT accuracy, timestamp, longitude, latitude " .
 			" FROM tracker_track_points " .
-			" WHERE id_user = '" . $id_user . "' AND timestamp >= '" . $timestamp_first ."'".
+			" WHERE id_user = '" . $id_user . "' AND timestamp >= '" . $timestamp_first . "'" .
 			" ORDER BY timestamp DESC" .
 			" LIMIT 3000";
 
@@ -647,7 +692,26 @@ class DataBase{
 
 		return $result;
 	}
-	//GetPoints_100-----------------------------------------------------
+	//------------------------------------------------------------------
+	public function GetPointsByPeriod( $id_user, $stamp_from, $stamp_to ){
+
+		$query = "SELECT accuracy, timestamp, longitude, latitude " .
+			" FROM tracker_track_points " .
+			" WHERE id_user = '" . $id_user .
+			"' AND timestamp >= '" . $stamp_from .
+			"' AND timestamp <= '" . $stamp_to . "'" .
+			" ORDER BY timestamp DESC" .
+			" LIMIT 1000";
+
+		var_error_log($query);
+
+		$this->ConnectToDB();
+		$result = $this->mysqli->query( $query );
+		$this->DisconnectFromDB();
+
+		return $result;
+	}
+	//------------------------------------------------------------------
 
 
 	//------------------------------------------------------------------
@@ -775,6 +839,7 @@ function GetUserIp(){
 	}
 	return $ip;
 }
+
 //GetUserIp-----------------------------------------------------------
 
 //--------------------------------------------------------------------
