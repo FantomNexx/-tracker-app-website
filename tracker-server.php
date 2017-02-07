@@ -24,6 +24,7 @@ abstract class Requests{
 	const GET_POINTS_100 = "GET_POINTS_100";
 	const GET_POINTS_LAST = "GET_POINTS_LAST";
 	const GET_POINTS_BY_PERIOD = "GET_POINTS_BY_PERIOD";
+	const GET_POINTS_BY_PERIOD_COUNT = "GET_POINTS_BY_PERIOD_COUNT";
 
 	const SYNC_POINTS = "SYNC_POINTS";
 }//Requests
@@ -31,6 +32,7 @@ abstract class Requests{
 abstract class ReplyCodes{
 	const SUCCESS = "SUCCESS";
 	const FAIL = "FAIL";
+	const FAIL_PARAMS = "FAIL_PARAMS";
 	const FAIL_DATA = "FAIL_DATA";
 
 	const IDENTITY_NFOUND = "IDENTITY_NFOUND";
@@ -107,6 +109,10 @@ class Engine{
 
 			case Requests::GET_POINTS_BY_PERIOD:
 				$this->GetPointsByPeriod();
+				break;
+
+			case Requests::GET_POINTS_BY_PERIOD_COUNT:
+				$this->GetPointsByPeriodCount();
 				break;
 
 			case Requests::SYNC_POINTS:
@@ -194,8 +200,8 @@ class Engine{
 
 		$result = $this->db->GetLastPoint( $user_id );
 
-		$user_last_point = null;
 
+		$user_last_point = null;
 
 		while( $row = $result->fetch_array( MYSQLI_ASSOC ) ){
 			$user_last_point = $row;
@@ -212,6 +218,7 @@ class Engine{
 		}//user was not found
 
 		$response_data = array( "user_last_point" => $user_last_point );
+
 
 		Out::Finish_JSON(
 			$this->request,
@@ -433,16 +440,23 @@ class Engine{
 		$user_id = $_POST['user_id'];
 		$stamp_from = $_POST['stamp_from'];
 		$stamp_to = $_POST['stamp_to'];
+		$limit_from = $_POST['limit_from'];
+		$limit = $_POST['limit'];
 
-		if( $user_id == null || $stamp_from == null || $stamp_to == null ){
+		if( $user_id == null ||
+			$stamp_from == null ||
+			$stamp_to == null ||
+			$limit_from == null ||
+			$limit == null
+		){
 			Out::Finish_JSON(
-				$this->request, ReplyCodes::FAIL_DATA,
+				$this->request, ReplyCodes::FAIL_PARAMS,
 				"", ""
 			);
-		}//if no user id or timestamp last was provided
+		}//if wrong params were provided
 
 		$result = $this->db->GetPointsByPeriod(
-			$user_id, $stamp_from, $stamp_to );
+			$user_id, $stamp_from, $stamp_to, $limit_from, $limit );
 
 		if( $result == false ){
 			Out::Finish_JSON(
@@ -460,6 +474,30 @@ class Engine{
 
 		$result->free();
 		$response_data = array( "points" => $points );
+
+		Out::Finish_JSON(
+			$this->request, ReplyCodes::SUCCESS,
+			$response_data, ""
+		);//Out
+	}
+	//------------------------------------------------------------------
+	private function GetPointsByPeriodCount(){
+
+		$user_id = $_POST['user_id'];
+		$stamp_from = $_POST['stamp_from'];
+		$stamp_to = $_POST['stamp_to'];
+
+		if( $user_id == null || $stamp_from == null || $stamp_to == null ){
+			Out::Finish_JSON(
+				$this->request, ReplyCodes::FAIL_DATA,
+				"", ""
+			);
+		}//if no user id or timestamp last was provided
+
+		$count = $this->db->GetPointsByPeriodCount(
+			$user_id, $stamp_from, $stamp_to );
+
+		$response_data = array( "count" => $count );
 
 		Out::Finish_JSON(
 			$this->request, ReplyCodes::SUCCESS,
@@ -523,9 +561,8 @@ class Engine{
 		);//Out
 	}//GetPoints
 	//------------------------------------------------------------------
-
-}//Engine
-//Engine-------------------------------------------------------------
+}
+//--------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------
@@ -693,7 +730,7 @@ class DataBase{
 		return $result;
 	}
 	//------------------------------------------------------------------
-	public function GetPointsByPeriod( $id_user, $stamp_from, $stamp_to ){
+	public function GetPointsByPeriod( $id_user, $stamp_from, $stamp_to, $limit_from, $limit ){
 
 		$query = "SELECT accuracy, timestamp, longitude, latitude " .
 			" FROM tracker_track_points " .
@@ -701,9 +738,7 @@ class DataBase{
 			"' AND timestamp >= '" . $stamp_from .
 			"' AND timestamp <= '" . $stamp_to . "'" .
 			" ORDER BY timestamp DESC" .
-			" LIMIT 1000";
-
-		var_error_log($query);
+			" LIMIT " . $limit_from . ", " . $limit;
 
 		$this->ConnectToDB();
 		$result = $this->mysqli->query( $query );
@@ -759,7 +794,25 @@ class DataBase{
 	}//GetPoints
 	//------------------------------------------------------------------
 
+	//------------------------------------------------------------------
+	public function GetPointsByPeriodCount( $id_user, $stamp_from, $stamp_to ){
 
+		$query = "SELECT COUNT(*) AS count " .
+			" FROM tracker_track_points " .
+			" WHERE id_user = '" . $id_user .
+			"' AND timestamp >= '" . $stamp_from .
+			"' AND timestamp <= '" . $stamp_to . "'";
+
+		$this->ConnectToDB();
+		$result = $this->mysqli->query( $query );
+		$this->DisconnectFromDB();
+
+		$count_data = $result->fetch_array( MYSQLI_ASSOC );
+
+		$result->free();
+
+		return $count_data["count"];
+	}
 	//------------------------------------------------------------------
 	public function IsExists( $point ){
 
@@ -793,7 +846,7 @@ class DataBase{
 		}//if
 
 		return true;
-	}//IsExists
+	}
 	//------------------------------------------------------------------
 
 }//DataBase

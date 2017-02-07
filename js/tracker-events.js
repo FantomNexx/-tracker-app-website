@@ -15,10 +15,9 @@ var TrackerEvents = function(){
 
     if( is_inited_mouse_events == true ) return;
 
-
     var html = $( 'html' );
 
-    html.on( 'mousemove', OnEvent )
+    html.on( 'mousemove', OnEvent );
     html.on( 'mouseleave', OnEvent );
     html.on( 'mousedown', OnEvent );
     html.on( 'mouseup', OnEvent );

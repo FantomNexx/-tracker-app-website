@@ -37,8 +37,8 @@ var TrackerPeriod = function(){
   self.GeoPeriodToStamp = function(){
     return date_to.stamp;
   };
-  
   //------------------------------------------------------------------
+  
   
   function Init_DateTimePickers(){
     
@@ -76,15 +76,15 @@ var TrackerPeriod = function(){
     
     var tmp_date = new Date();
     
-    SetDate( date_to, tmp_date );
+    SetDate( date_to, tmp_date.getTime() );
     
     tmp_date.setHours( tmp_date.getHours() - default_track_period );
     
-    SetDate( date_from, tmp_date );
+    SetDate( date_from, tmp_date.getTime() );
   }
   
-  function SetDate( date_obj, date_data ){
-    date_obj.stamp = date_data.getTime();
+  function SetDate( date_obj, date_stamp ){
+    date_obj.stamp = date_stamp;
     date_obj.date  = new Date( date_obj.stamp );
     date_obj.str   = FormatTimeStamp( date_obj.stamp );
   }
@@ -92,10 +92,12 @@ var TrackerPeriod = function(){
   function OnDatePickerChange_From( e, date ){
     //date_to.el.bootstrapMaterialDatePicker( 'setMinDate', date );
     console.log( "OnDatePickerChange_From" );
+    SetDate( date_from, date._d.getTime() );
   }
   
   function OnDatePickerChange_To( e, date ){
     console.log( "OnDatePickerChange_To" );
+    SetDate( date_to, date._d.getTime() );
   }
   
   

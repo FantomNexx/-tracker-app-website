@@ -48,6 +48,38 @@
 <!--CONTENT---------------------------------------------------------->
 <div id="id_nav_bar">
     <div id="id_logo_text">Fantom Tracker</div>
+
+    <div id="id-icon-auto-center" class="toolbar_icon">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path d="M256.128,66.81a132.62,132.62,0,0,1,132.62,132.619c0,132.439-132.62,246.456-132.62,246.456S123.509,328.453,123.509,199.429A132.62,132.62,0,0,1,256.128,66.81Z"></path>
+            <circle cx="255.328" cy="199.391" r="65.859"></circle>
+            <path d="M256.123,241.724V274.3"></path>
+            <path d="M256.123,125.24v32.573"></path>
+            <path d="M213.773,199.765H181.59"></path>
+            <path d="M328.3,199.765H296.119"></path>
+
+        </svg>
+    </div>
+
+    <div id="id-icon-auto-update" class="toolbar_icon">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path d="M256.128,66.81a132.62,132.62,0,0,1,132.62,132.619c0,132.439-132.62,246.456-132.62,246.456S123.509,328.453,123.509,199.429A132.62,132.62,0,0,1,256.128,66.81Z"></path>
+            <path d="M321.815,194.7q0.327,3.27.33,6.628a65.728,65.728,0,0,1-118.969,38.541m-12.2-32.412q-0.281-3.027-.282-6.129A65.729,65.729,0,0,1,309.675,162.8"></path>
+            <path d="M305.27,209.43l15.59-15.59,15.64,15.64"></path>
+            <path d="M176.594,194.043l15.59,15.589,15.64-15.64"></path>
+
+        </svg>
+    </div>
+
+    <div id="id-icon-calendar" class="toolbar_icon">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path d="M221.013,105.484h67.974m81.141,0h58.789V410.451H81.083V105.484H141.4"></path>
+            <path d="M82.308,198.566H427.692"></path>
+            <path d="M180.9,56.8V141.92"></path>
+            <path d="M330.323,56.8V141.92"></path>
+        </svg>
+    </div>
+
 </div>
 
 <!--DATETIMER PICKER------------------------------------------------->
@@ -56,17 +88,21 @@
     <div id="id-datetime-picker-cntr">
 
         <div id="id-datetime-picker-cntr-from"
-             style="width: 120px; float: left">
+             style="">
             <div class="fantom-input-datetimer-picker-label">From</div>
             <input id="id_input_date_from" type="text" class="fantom-input-datetimer-picker"
                    value="18/03/2015 08:00"/>
         </div>
 
         <div id="id-datetime-picker-cntr-to"
-             style="width: 120px; float: left; margin-left: 16px;">
+             style="">
             <div class="fantom-input-datetimer-picker-label">To</div>
             <input id="id_input_date_to" type="text" class="fantom-input-datetimer-picker"
                    value="18/03/2015 18:00"/>
+        </div>
+
+        <div id="id-btn-update-period">
+            UPDATE
         </div>
 
         <div style="clear: both"></div>
@@ -90,6 +126,7 @@
 <script defer src="./js/tracker-data.js"></script>
 <script defer src="./js/tracker-utils.js"></script>
 <script defer src="./js/tracker-period.js"></script>
+<script defer src="./js/tracker-data-period.js"></script>
 <script defer src="./js/tracker-script-test-3.js"></script>
 <!--END SCRIPTS------------------------------------------------------>
 
