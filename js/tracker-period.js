@@ -7,7 +7,6 @@ var TrackerPeriod = function(){
     stamp: 0,
     el   : undefined
   };
-  
   var date_to = {
     str  : "",
     date : undefined,
@@ -17,27 +16,24 @@ var TrackerPeriod = function(){
   
   var default_track_period = 12;//in hours
   
-  //------------------------------------------------------------------
   
   self.Init = function(){
-    SetDefaults_PeriodHolders();
+    Init_DateTimeFileds();
     Init_DateTimePickers();
   };
   
-  //------------------------------------------------------------------
   /**
    * @returns {number}
    */
-  self.GeoPeriodFromStamp = function(){
+  self.GetPeriodFromStamp = function(){
     return date_from.stamp;
   };
   /**
    * @returns {number}
    */
-  self.GeoPeriodToStamp = function(){
+  self.GetPeriodToStamp = function(){
     return date_to.stamp;
   };
-  //------------------------------------------------------------------
   
   
   function Init_DateTimePickers(){
@@ -72,14 +68,10 @@ var TrackerPeriod = function(){
     $( ".dtp-btn-cancel" ).text( "ОТМЕНА" );
   }
   
-  function SetDefaults_PeriodHolders(){
-    
+  function Init_DateTimeFileds(){
     var tmp_date = new Date();
-    
     SetDate( date_to, tmp_date.getTime() );
-    
     tmp_date.setHours( tmp_date.getHours() - default_track_period );
-    
     SetDate( date_from, tmp_date.getTime() );
   }
   
@@ -90,7 +82,7 @@ var TrackerPeriod = function(){
   }
   
   function OnDatePickerChange_From( e, date ){
-    //date_to.el.bootstrapMaterialDatePicker( 'setMinDate', date );
+    date_to.el.bootstrapMaterialDatePicker( 'setMinDate', date );
     console.log( "OnDatePickerChange_From" );
     SetDate( date_from, date._d.getTime() );
   }

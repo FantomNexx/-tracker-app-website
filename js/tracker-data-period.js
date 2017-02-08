@@ -1,25 +1,60 @@
 var TrackerDataPeriod = function(){
-  //------------------------------------------------------------------
+  
   var self = {};
   
   var tracker_period = new TrackerPeriod();
   
-  var track_points       = undefined;
-  var track_points_count = 0;
+  var track_points            = undefined;
+  var track_points_count      = 0;
+  var track_points_limit      = 100;
+  var track_points_limit_from = 0;
   
   var Func_InitTrack = undefined;
   
-  var state = TrackerDataPeriod.STATES.STATE_IDLE;
+  var el_toolbar_btn_update = undefined;
   
-  var LIMIT      = 100;
-  var limit_from = 0;
-  //------------------------------------------------------------------
+  var state_request = TrackerDataPeriod.STATES.STATE_IDLE;
   
+  
+  /**
+   * @constructor Init
+   */
   self.Init = function(){
     
-    tracker_period.Init();
+    if( InitElements() == false ){
+      console.log( "TrackerDataPeriod: Init failed, essential elements not found" );
+      return;
+    }
     
-    InitBtnUpdate();
+    InitEvents();
+    
+    tracker_period.Init();
+  };
+  /**
+   * @constructor SetFunc_InitTrack
+   */
+  self.SetFunc_InitTrack = function( func ){
+    Func_InitTrack = func;
+  };
+  
+  /**
+   * @returns {boolean}
+   */
+  function InitElements(){
+    
+    el_toolbar_btn_update = $( "#id-btn-update-period" );
+    
+    if( el_toolbar_btn_update.length == 0
+    ){
+      return false;
+    }//if
+    
+    el_toolbar_btn_update.on( "click", GetPoints );
+    
+    return true;
+  }
+  
+  function InitEvents(){
     
     event_helper.SubscribeOn(
       Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod,
@@ -28,43 +63,33 @@ var TrackerDataPeriod = function(){
     event_helper.SubscribeOn(
       Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod_Count,
       { callback: OnSuccess_GetPoints_ByPeriod_Count } );
-  };
-  
-  //------------------------------------------------------------------
-  self.SetFunc_InitTrack = function( func ){
-    Func_InitTrack = func;
-  };
+  }
   
   
-  //------------------------------------------------------------------
-  function InitBtnUpdate(){
+  function GetPoints(){
     
-    var btn_el = $( "#id-btn-update-period" );
-    
-    if( btn_el.length == 0 ){
+    if( state_request != TrackerDataPeriod.STATES.STATE_IDLE ){
+      console.log( "TrackerDataPeriod: cannot get points, points request already started." );
       return;
     }
     
-    btn_el.on( "click", function( e ){
-      
-      track_points = [];
-      GetPoints_ByPeriod_Count();
-      
-    } );
+    state_request = TrackerDataPeriod.STATES.STATE_REQUESTING;
+    
+    track_points = [];
+    
+    GetPoints_ByPeriod_Count();
   }
   
-  //------------------------------------------------------------------
   function GetPoints_ByPeriod(){
     
     var request_data = {
       user_id      : param_user_id,
       user_password: param_user_password,
       request      : Transport.REQUESTS.GET_POINTS_BY_PERIOD,
-      stamp_from   : tracker_period.GeoPeriodFromStamp(),
-      stamp_to     : tracker_period.GeoPeriodToStamp(),
-      limit_from   : limit_from,
-      limit        : LIMIT
-      
+      stamp_from   : tracker_period.GetPeriodFromStamp(),
+      stamp_to     : tracker_period.GetPeriodToStamp(),
+      limit_from   : track_points_limit_from,
+      limit        : track_points_limit
     };
     
     Transport.Request(
@@ -72,24 +97,31 @@ var TrackerDataPeriod = function(){
       Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod );
   }
   
-  //------------------------------------------------------------------
   function OnSuccess_GetPoints_ByPeriod( obj_reply ){
     
     if( obj_reply["data"] == undefined ){
-      console.log( "Reply has no data" );
+      console.log( "TrackerDataPeriod: Reply has no data" );
+      state_request = TrackerDataPeriod.STATES.STATE_IDLE;
       return;
     }//if
     
     var data = obj_reply["data"];
     
     if( data["points"] == undefined ){
-      console.log( "Reply has no trac data" );
+      console.log( "TrackerDataPeriod: Reply has no points data" );
+      state_request = TrackerDataPeriod.STATES.STATE_IDLE;
+      return;
+    }//if
+    
+    if( data["points"].length == 0 ){
+      console.log( "TrackerDataPeriod:  Reply has no points" );
+      state_request = TrackerDataPeriod.STATES.STATE_IDLE;
       return;
     }//if
     
     track_points = track_points.concat( data["points"] );
     
-    limit_from += LIMIT;
+    track_points_limit_from += track_points_limit;
     
     if( track_points.length < track_points_count ){
       GetPoints_ByPeriod();
@@ -103,15 +135,14 @@ var TrackerDataPeriod = function(){
     }
   }
   
-  //------------------------------------------------------------------
   function GetPoints_ByPeriod_Count(){
     
     var request_data = {
       user_id      : param_user_id,
       user_password: param_user_password,
       request      : Transport.REQUESTS.GET_POINTS_BY_PERIOD_COUNT,
-      stamp_from   : tracker_period.GeoPeriodFromStamp(),
-      stamp_to     : tracker_period.GeoPeriodToStamp()
+      stamp_from   : tracker_period.GetPeriodFromStamp(),
+      stamp_to     : tracker_period.GetPeriodToStamp()
     };
     
     Transport.Request(
@@ -119,7 +150,6 @@ var TrackerDataPeriod = function(){
       Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod_Count );
   }
   
-  //------------------------------------------------------------------
   function OnSuccess_GetPoints_ByPeriod_Count( obj_reply ){
     
     if( obj_reply["data"] == undefined ){
@@ -130,7 +160,14 @@ var TrackerDataPeriod = function(){
     var data = obj_reply["data"];
     
     if( data["count"] == undefined ){
-      console.log( "Reply has no count data" );
+      console.log( "TrackerDataPeriod: Reply has no count data" );
+      state_request = TrackerDataPeriod.STATES.STATE_IDLE;
+      return;
+    }//if
+    
+    if( data["count"] == 0 ){
+      console.log( "TrackerDataPeriod: Points count is 0" );
+      state_request = TrackerDataPeriod.STATES.STATE_IDLE;
       return;
     }//if
     
