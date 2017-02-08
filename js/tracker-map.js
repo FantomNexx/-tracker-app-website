@@ -7,14 +7,12 @@ var TrackerMap = function(){
   
   var is_google_map_inited = false;
   
-  var image_track_point = {
+  var image_track_point       = {
     url   : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point.png',
     size  : new google.maps.Size( 26, 26 ),
     origin: new google.maps.Point( 0, 0 ),
     anchor: new google.maps.Point( 13, 13 )
   };
-  
-  
   var image_track_point_minor = {
     url   : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point_minor.png',
     size  : new google.maps.Size( 26, 26 ),
@@ -80,8 +78,6 @@ var TrackerMap = function(){
     el_google_map.width( window.innerWidth );
     el_google_map.height( window.innerHeight - header_height );
   }
-
-//FitGoogleMapToScre
   
   function GetMapProperites( point, map_zoom ){
     return {
@@ -92,15 +88,137 @@ var TrackerMap = function(){
     };
   }//GetMapProperites
   
-  function GetGoogleCoords( point ){
-    return new google.maps.LatLng(
-      parseFloat( point.latitude ),
-      parseFloat( point.longitude ) );
-  }//GetGoogleCoords
+  
+  function DrawTrackMarkerLast( point ){
+    
+    if( obj_google_map == undefined ){
+      return
+    }//if
+    
+    //clean old marker
+    if( track_markers_last != undefined ){
+      track_markers_last.setMap( null );
+    }//if
+    
+    
+    track_markers_last = new google.maps.Marker( {
+      map      : obj_google_map,
+      title    : 'Алексей Верзун',
+      position : point.coords,
+      animation: google.maps.Animation.DROP
+    } );
+    
+    
+    var time = FormatTimeStamp( point.timestamp );
+    
+    var content = "" +
+      "<div style='text-align: center; '>" +
+      "<div style='font-weight: bold; font-size: 18px;'>Алексей Верзун</div>" +
+      "<div style='font-size: 16px;'>" + time + "</div></div>";
+    
+    
+    var infowindow = new google.maps.InfoWindow( {
+      content: content
+    } );
+    
+    
+    track_markers_last.addListener( 'click', function(){
+      infowindow.open( obj_google_map, track_markers_last );
+    } );
+  }//DrawTrackMarkerLast
+  
+  function DrawTrackMarkers( points, markers, marker_image ){
+    
+    if( obj_google_map == undefined ){
+      return
+    }//if
+    
+    var i;
+    
+    markers = [];
+    
+    for( i = 0; i < points.length; i++ ){
+      
+      var content_data = FormatTimeStamp( points[i].timestamp );
+      if( points[i].speed != undefined ){
+        content_data += " (" + points[i].speed + " км/ч )";
+      }//if
+      
+      var marker = DrawTrackMarker(
+        points[i].coords,
+        content_data,
+        marker_image );
+      
+      var content_info_window =
+            "<div style='text-align: center; padding: 0; font-size: 16px;'>" +
+            content_data + "</div>";
+      
+      marker["content_data_html"] = content_info_window;
+      
+      markers.push( marker );
+    }//for
+    
+    for( i = 0; i < points.length; i++ ){
+      
+      google.maps.event.addListener(
+        markers[i], 'click', (function( marker, i ){
+          return function(){
+            
+            if( infowindow != undefined ){
+              infowindow.close();
+            }//if
+            
+            infowindow = new google.maps.InfoWindow( {
+              content: marker["content_data_html"]
+            } );
+            
+            infowindow.setContent( marker["content_data_html"] );
+            infowindow.open( obj_google_map, markers[i] );
+          }
+        })( markers[i], i ) );
+    }//for
+    
+  }//DrawTrackMarkers
+  
+  function DrawTrackMarker( coords, title, image ){
+    
+    if( obj_google_map == undefined ){
+      return
+    }//if
+    
+    return new google.maps.Marker( {
+      map     : obj_google_map,
+      position: coords,
+      title   : title,
+      icon    : image
+    } );
+  }//DrawTrackMarker
+  
+  function DrawTrackLine( track_points_line_coords ){
+    
+    if( obj_google_map == undefined ){
+      return
+    }//if
+    
+    //lean old line
+    if( track_line != undefined ){
+      track_line.setMap( null );
+    }//if
+    
+    track_line = new google.maps.Polyline( {
+      path         : track_points_line_coords,
+      geodesic     : true,
+      strokeColor  : "#cc0000",
+      strokeOpacity: 0.7,
+      strokeWeight : 5
+    } );
+    
+    track_line.setMap( obj_google_map );
+  }//DrawTrackLine
+  
   
   return self;
 };
-
 
 var GOOGLE_MAP_STYLES = [{
   "featureType": "landscape",

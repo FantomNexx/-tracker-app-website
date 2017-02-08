@@ -4,14 +4,10 @@ var TrackerDataPeriod = function(){
   
   var tracker_period = new TrackerPeriod();
   
-  var track_points            = undefined;
+  var tracks_points           = undefined;
   var track_points_count      = 0;
-  var track_points_limit      = 100;
+  var track_points_limit      = 1000;
   var track_points_limit_from = 0;
-  
-  var Func_InitTrack = undefined;
-  
-  var el_toolbar_btn_update = undefined;
   
   var state_request = TrackerDataPeriod.STATES.STATE_IDLE;
   
@@ -24,35 +20,28 @@ var TrackerDataPeriod = function(){
     if( InitElements() == false ){
       console.log( "TrackerDataPeriod: Init failed, essential elements not found" );
       return;
-    }
+    }//if
     
     InitEvents();
     
     tracker_period.Init();
-  };
-  /**
-   * @constructor SetFunc_InitTrack
-   */
-  self.SetFunc_InitTrack = function( func ){
-    Func_InitTrack = func;
-  };
+  };//Init
   
   /**
    * @returns {boolean}
    */
   function InitElements(){
     
-    el_toolbar_btn_update = $( "#id-btn-update-period" );
+    var el_toolbar_btn_update = $( "#id-btn-update-period" );
     
-    if( el_toolbar_btn_update.length == 0
-    ){
+    if( el_toolbar_btn_update.length == 0 ){
       return false;
     }//if
     
     el_toolbar_btn_update.on( "click", GetPoints );
     
     return true;
-  }
+  }//InitElements
   
   function InitEvents(){
     
@@ -63,7 +52,7 @@ var TrackerDataPeriod = function(){
     event_helper.SubscribeOn(
       Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod_Count,
       { callback: OnSuccess_GetPoints_ByPeriod_Count } );
-  }
+  }//InitEvents
   
   
   function GetPoints(){
@@ -75,16 +64,16 @@ var TrackerDataPeriod = function(){
     
     state_request = TrackerDataPeriod.STATES.STATE_REQUESTING;
     
-    track_points = [];
+    tracks_points = [];
     
     GetPoints_ByPeriod_Count();
-  }
+  }//GetPoints
   
   function GetPoints_ByPeriod(){
     
     var request_data = {
-      user_id      : param_user_id,
-      user_password: param_user_password,
+      user_id      : Data.user_id,
+      user_password: Data.user_password,
       request      : Transport.REQUESTS.GET_POINTS_BY_PERIOD,
       stamp_from   : tracker_period.GetPeriodFromStamp(),
       stamp_to     : tracker_period.GetPeriodToStamp(),
@@ -95,7 +84,7 @@ var TrackerDataPeriod = function(){
     Transport.Request(
       request_data,
       Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod );
-  }
+  }//GetPoints_ByPeriod
   
   function OnSuccess_GetPoints_ByPeriod( obj_reply ){
     
@@ -119,27 +108,29 @@ var TrackerDataPeriod = function(){
       return;
     }//if
     
-    track_points = track_points.concat( data["points"] );
+    if( data["points"].length == 0 ){
+      state_request = TrackerDataPeriod.STATES.STATE_IDLE;
+      return;
+    }//if
+    
+    tracks_points = tracks_points.concat( data["points"] );
     
     track_points_limit_from += track_points_limit;
     
-    if( track_points.length < track_points_count ){
+    if( tracks_points.length < track_points_count ){
       GetPoints_ByPeriod();
-    }else{
-      
-      if( track_points.length == 0 ){
-        return;
-      }
-      
-      Func_InitTrack( track_points );
-    }
-  }
+      return
+    }//if
+    
+    Data.tracks_points = tracks_points;
+    event_helper.Trigger( Data.EVENTS.OnTracksPointsLoaded );
+  }//OnSuccess_GetPoints_ByPeriod
   
   function GetPoints_ByPeriod_Count(){
     
     var request_data = {
-      user_id      : param_user_id,
-      user_password: param_user_password,
+      user_id      : Data.user_id,
+      user_password: Data.user_password,
       request      : Transport.REQUESTS.GET_POINTS_BY_PERIOD_COUNT,
       stamp_from   : tracker_period.GetPeriodFromStamp(),
       stamp_to     : tracker_period.GetPeriodToStamp()
@@ -148,7 +139,7 @@ var TrackerDataPeriod = function(){
     Transport.Request(
       request_data,
       Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod_Count );
-  }
+  }//GetPoints_ByPeriod_Count
   
   function OnSuccess_GetPoints_ByPeriod_Count( obj_reply ){
     
@@ -174,7 +165,7 @@ var TrackerDataPeriod = function(){
     track_points_count = data["count"];
     
     GetPoints_ByPeriod();
-  }
+  }//OnSuccess_GetPoints_ByPeriod_Count
   
   
   return self;
