@@ -27,6 +27,11 @@ var TrackerDataPeriod = function(){
     tracker_period.Init();
   };//Init
   
+  
+  self.SetDatePeriod = function( date_from, date_to ){
+    tracker_period.SetDatePeriod( date_from, date_to );
+  };//SetDatePeriod
+  
   /**
    * @returns {boolean}
    */
@@ -43,15 +48,16 @@ var TrackerDataPeriod = function(){
     return true;
   }//InitElements
   
+  
   function InitEvents(){
     
     event_helper.SubscribeOn(
-      Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod,
-      { callback: OnSuccess_GetPoints_ByPeriod } );
+      Data.EVENTS.OnReqSucc_GetPoints_Period,
+      { callback : OnSuccess_GetPoints_ByPeriod } );
     
     event_helper.SubscribeOn(
-      Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod_Count,
-      { callback: OnSuccess_GetPoints_ByPeriod_Count } );
+      Data.EVENTS.OnReqSucc_GetPoints_Period_Count,
+      { callback : OnSuccess_GetPoints_ByPeriod_Count } );
   }//InitEvents
   
   
@@ -69,22 +75,24 @@ var TrackerDataPeriod = function(){
     GetPoints_ByPeriod_Count();
   }//GetPoints
   
+  
   function GetPoints_ByPeriod(){
     
     var request_data = {
-      user_id      : Data.user_id,
-      user_password: Data.user_password,
-      request      : Transport.REQUESTS.GET_POINTS_BY_PERIOD,
-      stamp_from   : tracker_period.GetPeriodFromStamp(),
-      stamp_to     : tracker_period.GetPeriodToStamp(),
-      limit_from   : track_points_limit_from,
-      limit        : track_points_limit
+      user_id       : Data.user_id,
+      user_password : Data.user_password,
+      request       : Transport.REQUESTS.GET_POINTS_BY_PERIOD,
+      stamp_from    : tracker_period.GetPeriodFromStamp(),
+      stamp_to      : tracker_period.GetPeriodToStamp(),
+      limit_from    : track_points_limit_from,
+      limit         : track_points_limit
     };
     
     Transport.Request(
       request_data,
-      Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod );
+      Data.EVENTS.OnReqSucc_GetPoints_Period );
   }//GetPoints_ByPeriod
+  
   
   function OnSuccess_GetPoints_ByPeriod( obj_reply ){
     
@@ -123,23 +131,25 @@ var TrackerDataPeriod = function(){
     }//if
     
     Data.tracks_points = tracks_points;
-    event_helper.Trigger( Data.EVENTS.OnTracksPointsLoaded );
+    event_helper.Trigger( Data.EVENTS.OnLoaded_PointsPeriod );
   }//OnSuccess_GetPoints_ByPeriod
+  
   
   function GetPoints_ByPeriod_Count(){
     
     var request_data = {
-      user_id      : Data.user_id,
-      user_password: Data.user_password,
-      request      : Transport.REQUESTS.GET_POINTS_BY_PERIOD_COUNT,
-      stamp_from   : tracker_period.GetPeriodFromStamp(),
-      stamp_to     : tracker_period.GetPeriodToStamp()
+      user_id       : Data.user_id,
+      user_password : Data.user_password,
+      request       : Transport.REQUESTS.GET_POINTS_BY_PERIOD_COUNT,
+      stamp_from    : tracker_period.GetPeriodFromStamp(),
+      stamp_to      : tracker_period.GetPeriodToStamp()
     };
     
     Transport.Request(
       request_data,
-      Data.EVENTS.OnRequestSuccess_GetPoints_ByPeriod_Count );
+      Data.EVENTS.OnReqSucc_GetPoints_Period_Count );
   }//GetPoints_ByPeriod_Count
+  
   
   function OnSuccess_GetPoints_ByPeriod_Count( obj_reply ){
     
@@ -172,12 +182,12 @@ var TrackerDataPeriod = function(){
 };
 
 TrackerDataPeriod.STATES = {
-  STATE_IDLE      : "STATE_IDLE",
-  STATE_REQUESTING: "STATE_REQUESTING",
-  STATE_STOPPING  : "STATE_STOPPING"
+  STATE_IDLE       : "STATE_IDLE",
+  STATE_REQUESTING : "STATE_REQUESTING",
+  STATE_STOPPING   : "STATE_STOPPING"
 };
 
 TrackerDataPeriod.COMMANDS = {
-  REQUEST: "REQUEST",
-  STOP   : "STOP"
+  REQUEST : "REQUEST",
+  STOP    : "STOP"
 };

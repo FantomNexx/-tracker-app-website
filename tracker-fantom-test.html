@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
 
 
     <link type="text/css" rel="stylesheet"
@@ -14,7 +15,7 @@
     <script type="text/javascript"
             src="./js/jquery-2.1.4.js"></script>
 
-    <!--DATEPICKER--------------------------------------------------->
+    <!--DATEPICKER----------------------------------------->
     <link type="text/css" rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
@@ -36,16 +37,14 @@
 
     <script type="text/javascript"
             src="./datetime-picker/datetime-picker.js"></script>
-
-
-    <!--END DATEPICKER----------------------------------------------->
+    <!--END DATEPICKER------------------------------------->
 
     <title>Fantom Tracker</title>
 </head>
 <body>
 
 
-<!--CONTENT---------------------------------------------------------->
+<!--CONTENT------------------------------------------------>
 <div id="id_nav_bar">
     <div id="id_logo_text">Fantom Tracker</div>
 
@@ -57,7 +56,6 @@
             <path d="M256.123,125.24v32.573"></path>
             <path d="M213.773,199.765H181.59"></path>
             <path d="M328.3,199.765H296.119"></path>
-
         </svg>
     </div>
 
@@ -67,7 +65,6 @@
             <path d="M321.815,194.7q0.327,3.27.33,6.628a65.728,65.728,0,0,1-118.969,38.541m-12.2-32.412q-0.281-3.027-.282-6.129A65.729,65.729,0,0,1,309.675,162.8"></path>
             <path d="M305.27,209.43l15.59-15.59,15.64,15.64"></path>
             <path d="M176.594,194.043l15.59,15.589,15.64-15.64"></path>
-
         </svg>
     </div>
 
@@ -82,54 +79,48 @@
 
 </div>
 
-<!--DATETIMER PICKER------------------------------------------------->
+<!--DATETIMER PICKER--------------------------------------->
 <div id="id-nav-bar-dateperiod">
 
     <div id="id-datetime-picker-cntr">
 
-        <div id="id-datetime-picker-cntr-from"
-             style="">
+        <div id="id-datetime-picker-cntr-from">
             <div class="fantom-input-datetimer-picker-label">From</div>
-            <input id="id_input_date_from" type="text" class="fantom-input-datetimer-picker"
-                   value="18/03/2015 08:00"/>
+            <input id="id_input_date_from" type="text"
+                   class="fantom-input-datetimer-picker"/>
         </div>
 
-        <div id="id-datetime-picker-cntr-to"
-             style="">
+        <div id="id-datetime-picker-cntr-to">
             <div class="fantom-input-datetimer-picker-label">To</div>
-            <input id="id_input_date_to" type="text" class="fantom-input-datetimer-picker"
-                   value="18/03/2015 18:00"/>
+            <input id="id_input_date_to" type="text"
+                   class="fantom-input-datetimer-picker"/>
         </div>
 
-        <div id="id-btn-update-period">
-            UPDATE
-        </div>
+        <div id="id-btn-update-period">UPDATE</div>
 
         <div style="clear: both"></div>
     </div>
 </div>
-<!--END DATETIMER PICKER--------------------------------------------->
+<!--END DATETIMER PICKER----------------------------------->
 
 
 <div id="id_map_container">
-    <div id='id_google_map'
-         style='width: 10px; height: 10px; z-index: 0;'>
-    </div>
+    <div id="id_google_map"></div>
 </div>
-<!--END CONTENT------------------------------------------------------>
+<!--END CONTENT-------------------------------------------->
 
 
-<!--SCRIPTS---------------------------------------------------------->
+<!--SCRIPTS------------------------------------------------>
 <script defer src="./js/tracker-events.js"></script>
 <script defer src="./js/tracker-transport-2.js"></script>
 <script defer src="./js/tracker-data-model.js"></script>
 <script defer src="./js/tracker-utils.js"></script>
-<script defer src="./js/tracker-period.js"></script>
-<script defer src="./js/tracker-data-period.js"></script>
+<script defer src="./js/tracker-date-period.js"></script>
+<script defer src="./js/tracker-points-period.js"></script>
 <script defer src="./js/tracker-toolbar.js"></script>
 <script defer src="./js/tracker-map.js"></script>
 <script defer src="./js/tracker-fantom-test.js"></script>
-<!--END SCRIPTS------------------------------------------------------>
+<!--END SCRIPTS-------------------------------------------->
 
 </body>
 </html>

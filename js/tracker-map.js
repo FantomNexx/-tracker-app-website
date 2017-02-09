@@ -109,7 +109,7 @@ var TrackerMap = function(){
     } );
     
     
-    var time = FormatTimeStamp( point.timestamp );
+    var time = FormatTStamp_Long( point.timestamp );
     
     var content = "" +
       "<div style='text-align: center; '>" +
@@ -139,7 +139,7 @@ var TrackerMap = function(){
     
     for( i = 0; i < points.length; i++ ){
       
-      var content_data = FormatTimeStamp( points[i].timestamp );
+      var content_data = FormatTStamp_Long( points[i].timestamp );
       if( points[i].speed != undefined ){
         content_data += " (" + points[i].speed + " км/ч )";
       }//if
