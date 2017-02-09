@@ -7,17 +7,19 @@ var TrackerMap = function(){
   
   var is_google_map_inited = false;
   
+  var polylines = [];
+  
   var image_track_point       = {
-    url   : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point.png',
-    size  : new google.maps.Size( 26, 26 ),
-    origin: new google.maps.Point( 0, 0 ),
-    anchor: new google.maps.Point( 13, 13 )
+    url    : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point.png',
+    size   : new google.maps.Size( 26, 26 ),
+    origin : new google.maps.Point( 0, 0 ),
+    anchor : new google.maps.Point( 13, 13 )
   };
   var image_track_point_minor = {
-    url   : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point_minor.png',
-    size  : new google.maps.Size( 26, 26 ),
-    origin: new google.maps.Point( 0, 0 ),
-    anchor: new google.maps.Point( 13, 13 )
+    url    : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point_minor.png',
+    size   : new google.maps.Size( 26, 26 ),
+    origin : new google.maps.Point( 0, 0 ),
+    anchor : new google.maps.Point( 13, 13 )
   };
   
   var DEFAULT_MAP_ZOOM = 10;
@@ -32,8 +34,13 @@ var TrackerMap = function(){
       return false;
     }//if
     
+    event_helper.SubscribeOn(
+      Data.EVENTS.OnReady_Tracks,
+      { callback : OnReady_Tracks } );
+    
     return true;
   };//Init
+  
   
   /**
    * @returns {boolean}
@@ -65,28 +72,46 @@ var TrackerMap = function(){
     return true;
   }//InitMap
   
+  
   function FitGoogleMapToScreen(){
-    
-    var header_height = 0;
-    /*
-     var el_header     = $( ".mdl-layout__header-row" );
-     if( el_header.length != 0 ){
-     header_height = $( el_header[0] ).height();
-     }//if
-     */
-    
     el_google_map.width( window.innerWidth );
-    el_google_map.height( window.innerHeight - header_height );
-  }
+    el_google_map.height( window.innerHeight );
+  }//FitGoogleMapToScreen
+  
   
   function GetMapProperites( point, map_zoom ){
     return {
-      center        : point,
-      mapTypeControl: false,//hides Satelite / Schema switcher
-      zoom          : map_zoom//,
+      center         : point,
+      mapTypeControl : false,//hides Satelite / Schema switcher
+      zoom           : map_zoom//,
       //styles      : GOOGLE_MAP_STYLES
     };
   }//GetMapProperites
+  
+  
+  function OnReady_Tracks(){
+    
+    if( Data.tracks.length == 0 ){
+      return;
+    }//if
+    
+    for( var i = 0; i < Data.tracks.length; i++ ){
+      ProcessAndDrawTrack( Data.tracks[i] );
+    }//for
+    
+  }//OnReady_Tracks
+  
+  
+  function ProcessAndDrawTrack( track ){
+    
+    var points_google_map = [];
+    
+    for( var i = 0; i < track.length; i++ ){
+      points_google_map.push( track[i].coords );
+    }//for
+    
+    DrawTrackLine( points_google_map );
+  }//ProcessAndDrawTrack
   
   
   function DrawTrackMarkerLast( point ){
@@ -102,10 +127,10 @@ var TrackerMap = function(){
     
     
     track_markers_last = new google.maps.Marker( {
-      map      : obj_google_map,
-      title    : 'Алексей Верзун',
-      position : point.coords,
-      animation: google.maps.Animation.DROP
+      map       : obj_google_map,
+      title     : 'Алексей Верзун',
+      position  : point.coords,
+      animation : google.maps.Animation.DROP
     } );
     
     
@@ -118,7 +143,7 @@ var TrackerMap = function(){
     
     
     var infowindow = new google.maps.InfoWindow( {
-      content: content
+      content : content
     } );
     
     
@@ -126,6 +151,7 @@ var TrackerMap = function(){
       infowindow.open( obj_google_map, track_markers_last );
     } );
   }//DrawTrackMarkerLast
+  
   
   function DrawTrackMarkers( points, markers, marker_image ){
     
@@ -145,9 +171,7 @@ var TrackerMap = function(){
       }//if
       
       var marker = DrawTrackMarker(
-        points[i].coords,
-        content_data,
-        marker_image );
+        points[i].coords, content_data, marker_image );
       
       var content_info_window =
             "<div style='text-align: center; padding: 0; font-size: 16px;'>" +
@@ -169,7 +193,7 @@ var TrackerMap = function(){
             }//if
             
             infowindow = new google.maps.InfoWindow( {
-              content: marker["content_data_html"]
+              content : marker["content_data_html"]
             } );
             
             infowindow.setContent( marker["content_data_html"] );
@@ -180,40 +204,47 @@ var TrackerMap = function(){
     
   }//DrawTrackMarkers
   
-  function DrawTrackMarker( coords, title, image ){
+  
+  function DrawTrackMarker( point_google_map, title, image ){
     
     if( obj_google_map == undefined ){
       return
     }//if
     
     return new google.maps.Marker( {
-      map     : obj_google_map,
-      position: coords,
-      title   : title,
-      icon    : image
+      map      : obj_google_map,
+      position : point_google_map,
+      title    : title,
+      icon     : image
     } );
   }//DrawTrackMarker
   
-  function DrawTrackLine( track_points_line_coords ){
+  
+  function DrawTrackLine( points_google_map ){
     
     if( obj_google_map == undefined ){
       return
     }//if
     
-    //lean old line
-    if( track_line != undefined ){
-      track_line.setMap( null );
-    }//if
+    //clean old line
+    /*
+     if( track_line != undefined ){
+     track_line.setMap( null );
+     }//if
+     */
     
-    track_line = new google.maps.Polyline( {
-      path         : track_points_line_coords,
-      geodesic     : true,
-      strokeColor  : "#cc0000",
-      strokeOpacity: 0.7,
-      strokeWeight : 5
+    var poly_line = new google.maps.Polyline( {
+      path          : points_google_map,
+      geodesic      : true,
+      strokeColor   : "#cc0000",
+      strokeOpacity : 0.7,
+      strokeWeight  : 5
     } );
     
-    track_line.setMap( obj_google_map );
+    poly_line.setMap( obj_google_map );
+    
+    polylines.push( poly_line );
+    
   }//DrawTrackLine
   
   
@@ -221,61 +252,61 @@ var TrackerMap = function(){
 };
 
 var GOOGLE_MAP_STYLES = [{
-  "featureType": "landscape",
-  "stylers"    : [
-    { "saturation": 0 },
-    { "lightness": 0 },
-    { "visibility": "on" }]
+  "featureType" : "landscape",
+  "stylers"     : [
+    { "saturation" : 0 },
+    { "lightness" : 0 },
+    { "visibility" : "on" }]
 }, {
-  "featureType": "poi",
-  "stylers"    : [
-    { "saturation": 50 },
-    { "lightness": 0 },
-    { "visibility": "all" }]
+  "featureType" : "poi",
+  "stylers"     : [
+    { "saturation" : 50 },
+    { "lightness" : 0 },
+    { "visibility" : "all" }]
 }, {
-  "featureType": "road.highway",
-  "stylers"    : [
-    { "saturation": -100 },
-    { "lightness": 20 },
-    { "visibility": "all" }]
+  "featureType" : "road.highway",
+  "stylers"     : [
+    { "saturation" : -100 },
+    { "lightness" : 20 },
+    { "visibility" : "all" }]
 }, {
-  "featureType": "road.arterial",
-  "stylers"    : [
-    { "saturation": -100 },
-    { "lightness": 30 },
-    { "visibility": "on" }]
+  "featureType" : "road.arterial",
+  "stylers"     : [
+    { "saturation" : -100 },
+    { "lightness" : 30 },
+    { "visibility" : "on" }]
 }, {
-  "featureType": "road.local",
-  "stylers"    : [
-    { "saturation": -100 },
-    { "lightness": 40 },
-    { "visibility": "on" }]
+  "featureType" : "road.local",
+  "stylers"     : [
+    { "saturation" : -100 },
+    { "lightness" : 40 },
+    { "visibility" : "on" }]
 }, {
-  "featureType": "transit",
-  "stylers"    : [
-    { "saturation": -100 },
-    { "visibility": "all" }]
+  "featureType" : "transit",
+  "stylers"     : [
+    { "saturation" : -100 },
+    { "visibility" : "all" }]
 }, {
-  "featureType": "administrative.province",
-  "stylers"    : [
-    { "visibility": "on" }]
+  "featureType" : "administrative.province",
+  "stylers"     : [
+    { "visibility" : "on" }]
 }, {
-  "featureType": "water",
-  "elementType": "labels",
-  "stylers"    : [
-    { "visibility": "on" },
-    { "lightness": -25 },
-    { "saturation": -100 }]
+  "featureType" : "water",
+  "elementType" : "labels",
+  "stylers"     : [
+    { "visibility" : "on" },
+    { "lightness" : -25 },
+    { "saturation" : -100 }]
 }, {
-  "featureType": "water",
-  "elementType": "geometry",
-  "stylers"    : [
-    { "color": "#6fbbdf" },
-    { "visibility": "on" }]
+  "featureType" : "water",
+  "elementType" : "geometry",
+  "stylers"     : [
+    { "color" : "#6fbbdf" },
+    { "visibility" : "on" }]
 }, {
-  "featureType": "water",
-  "elementType": "labels.text.fill",
-  "stylers"    : [
-    { "color": "#ffffff" },
-    { "visibility": "on" }]
+  "featureType" : "water",
+  "elementType" : "labels.text.fill",
+  "stylers"     : [
+    { "color" : "#ffffff" },
+    { "visibility" : "on" }]
 }];

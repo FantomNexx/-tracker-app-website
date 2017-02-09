@@ -10,6 +10,7 @@ var TrackerToolbar = function(){
   var css_icon_enbled   = "rgba(255, 255, 255, 0.2)";
   var css_icon_disabled = "transparent";
   
+  
   /**
    * @returns {boolean}
    */
@@ -22,6 +23,7 @@ var TrackerToolbar = function(){
     
     return true;
   };//Init
+  
   
   /**
    * @returns {boolean}
@@ -44,26 +46,34 @@ var TrackerToolbar = function(){
     el_toolbar_icon_auto_center.on( "click", OnClick_IconAutoCenter );
     el_toolbar_icon_calendar.on( "click", OnClick_IconCalendar );
   
-    SetIconEnabledState( el_toolbar_icon_auto_update, Data.is_enabled_auto_update);
-    SetIconEnabledState( el_toolbar_icon_auto_center, Data.is_enabled_auto_center);
+    SetIconEnabledState(
+      el_toolbar_icon_auto_update, Data.is_enabled_auto_update);
+    
+    SetIconEnabledState(
+      el_toolbar_icon_auto_center, Data.is_enabled_auto_center);
     
     return true;
   }//InitElements
   
+  
   function OnClick_IconAutoUpdate(){
     Data.is_enabled_auto_update = !Data.is_enabled_auto_update;
-    SetIconEnabledState( el_toolbar_icon_auto_update, Data.is_enabled_auto_update);
+    SetIconEnabledState(
+      el_toolbar_icon_auto_update, Data.is_enabled_auto_update);
   }//OnClick_IconAutoUpdate
+  
   
   function OnClick_IconAutoCenter(){
     Data.is_enabled_auto_center = !Data.is_enabled_auto_center;
-    SetIconEnabledState( el_toolbar_icon_auto_center, Data.is_enabled_auto_center);
+    SetIconEnabledState(
+      el_toolbar_icon_auto_center, Data.is_enabled_auto_center);
   }//OnClick_IconAutoUpdate
   
-  function OnClick_IconCalendar(){
   
+  function OnClick_IconCalendar(){
     Data.is_visible_toolbar_period = !Data.is_visible_toolbar_period;
-    SetIconEnabledState( el_toolbar_icon_calendar, Data.is_visible_toolbar_period);
+    SetIconEnabledState(
+      el_toolbar_icon_calendar, Data.is_visible_toolbar_period);
     
     if( Data.is_visible_toolbar_period ){
       el_toolbar_period_cntr.css( "display", "inherit" );
@@ -72,6 +82,7 @@ var TrackerToolbar = function(){
     }//if toolbar visible
     
   }//OnClick_IconCalendar
+  
   
   function SetIconEnabledState( el, state ){
     if( state ){
