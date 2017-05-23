@@ -10,13 +10,13 @@ var TrackerMap = function(){
   var polylines = [];
   
   var image_track_point       = {
-    url    : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point.png',
+    url    : 'https://fantomsoftware.com/fantom_tracker/css/ic_track_point.png',
     size   : new google.maps.Size( 26, 26 ),
     origin : new google.maps.Point( 0, 0 ),
     anchor : new google.maps.Point( 13, 13 )
   };
   var image_track_point_minor = {
-    url    : 'http://fantomsoftware.com/fantom_tracker/css/ic_track_point_minor.png',
+    url    : 'https://fantomsoftware.com/fantom_tracker/css/ic_track_point_minor.png',
     size   : new google.maps.Size( 26, 26 ),
     origin : new google.maps.Point( 0, 0 ),
     anchor : new google.maps.Point( 13, 13 )
